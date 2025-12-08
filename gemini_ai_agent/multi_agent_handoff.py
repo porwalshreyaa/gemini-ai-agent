@@ -61,7 +61,7 @@ sales_agent = Agent(
     instruction=(
         "You are an expert sales agent for an internet broadband company. Talk to the user and help them with what they need."
     ),
-    tools=[fetch_available_plans, AgentTool(agent=refund_agent)],
+    tools=[fetch_available_plans],
 )
 
 
@@ -71,10 +71,15 @@ sales_agent = Agent(
 reception_agent = Agent(
     name="reception_agent",
     model="gemini-2.5-flash",
-    description="Reception agent for an internet broadband company to help users with their queries.",
+    description="""
+    You have two agents available:
+    - sales_agent: Expert in handeling queries like all plans and pricing available. Good for new customers
+    - refund_agent: Expert in handeling user queries for existing customers and issue refunds and help them
+    """,
     instruction=(
         "You are the customer facing agent expert in understanding what customer needs and then route them or handoff them to the right agent."
     ),
+    sub_agents=[sales_agent, refund_agent]
 
 )
 
@@ -84,7 +89,7 @@ reception_agent = Agent(
 
 
 async def main(query: str):
-    runner = InMemoryRunner(agent=sales_agent)
+    runner = InMemoryRunner(agent=reception_agent)
 
     events = await runner.run_debug(query)
 
@@ -102,4 +107,4 @@ async def main(query: str):
 
 
 if __name__ == "__main__":
-    asyncio.run(main("I did not like your internet services, I want refund. My customer Id is '00yhkiu379G'"))
+    asyncio.run(main("I am shifting to another location, I want refund for this plan and I'll like to buy a new plan. My customer Id is '786ohlp97gJ'"))

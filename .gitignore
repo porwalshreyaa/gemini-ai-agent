@@ -1,1 +1,2 @@
 gemini_ai_agent/.env
+*/__pycache__/
